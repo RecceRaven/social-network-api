@@ -1,5 +1,32 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
+// Define the ReactionSchema first
+const reactionSchema = new Schema({
+    reactionId: {
+        type: Schema.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId()
+    },
+    reactionBody: {
+        type: String,
+        required: true,
+        maxlength: 280
+    },
+    username: {
+        type: String,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        get: timestamp => new Date(timestamp).toLocaleString()
+    }
+}, {
+    toJSON: { getters: true },
+    id: false
+});
+
+// Now define the ThoughtSchema using the ReactionSchema
 const ThoughtSchema = new mongoose.Schema({
     thoughtText: {
         type: String,
@@ -16,16 +43,12 @@ const ThoughtSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    reactions: [ReactionSchema]
+    reactions: [reactionSchema]
 }, {
     toJSON: {
         getters: true
     },
     id: false
-});
-
-const ReactionSchema = new mongoose.Schema({
-    // Define ReactionSchema here
 });
 
 ThoughtSchema.virtual('reactionCount').get(function() {
