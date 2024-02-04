@@ -1,9 +1,10 @@
-const User = require('./models/User');
-const Thought = require('./models/Thought');
+const express = require('express');
+const router = express.Router();
+const User = require('../../models/User');
+const Thought = require('../../models/Thought');
 
 // GET all users
-
-app.get('/api/users', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const users = await User.find({});
         res.json(users);
@@ -12,10 +13,8 @@ app.get('/api/users', async (req, res) => {
     }
 });
 
-
-//Get single user by ID
-
-app.get('/api/users/:id', async (req, res) => {
+// Get single user by ID
+router.get('/:id', async (req, res) => {
     try {
         const user = await User.findById(req.params.id)
                               .populate('thoughts')
@@ -30,8 +29,7 @@ app.get('/api/users/:id', async (req, res) => {
 });
 
 // POST new user
-
-app.post('/api/users', async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const newUser = new User(req.body);
         await newUser.save();
@@ -42,8 +40,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 // PUT update user by ID
-
-app.put('/api/users/:id', async (req, res) => {
+router.put('/:id', async (req, res) => {
     try {
         const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedUser) {
@@ -55,10 +52,8 @@ app.put('/api/users/:id', async (req, res) => {
     }
 });
 
-
 // DELETE user by ID and also delete associated thoughts
-
-app.delete('/api/users/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         await Thought.deleteMany({ username: req.params.id });
 
@@ -71,3 +66,5 @@ app.delete('/api/users/:id', async (req, res) => {
         res.status(500).send(err.message);
     }
 });
+
+module.exports = router;
