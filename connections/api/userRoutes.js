@@ -68,3 +68,29 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+// DELETE a friend from a user's friend list
+router.delete('/:userId/friends/:friendId', async (req, res) => {
+    try {
+        // Find the user who is removing the friend
+        const user = await User.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Check if the friend to be removed exists in the user's friend list
+        const friendIndex = user.friends.indexOf(req.params.friendId);
+        if (friendIndex === -1) {
+            return res.status(404).send('Friend not found in user\'s friend list');
+        }
+
+        // Remove the friend from the user's friend list
+        user.friends.splice(friendIndex, 1);
+        await user.save(); // Save the updated user document
+
+        res.json({ message: 'Friend removed successfully', user });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
